@@ -42,12 +42,12 @@ class SignUp(QtWidgets.QMainWindow):
                 return self.check_error[i][1](text)
         else:
             hashAndSalt = bcrypt.hashpw(self.password.encode(), bcrypt.gensalt()).decode('utf-8')
-            dataBase.execute_into(f"""INSERT INTO users (login, password, position) 
+            dataBase.execute_into(f"""INSERT INTO public."Users" (login, password, position) 
                                             VALUES('{self.login}', '{hashAndSalt}', 0)""")
             self.show_SignIn()
 
     def check_login_in_db(self, login):
-        query = f"""SELECT * FROM users WHERE login = '{login}'"""
+        query = f"""SELECT * FROM public."Users" WHERE login = '{login}'"""
         return bool(len([i for i in dataBase.execute_sel(query)]))
 
     def clear_label(self):
@@ -75,10 +75,11 @@ class SignIn(QtWidgets.QMainWindow):
         self.check(self.login, self.password)
 
     def check(self, login, password):
-        passwordHash = [i for i in dataBase.execute_sel(f"""SELECT password FROM users 
+        passwordHash = [i for i in dataBase.execute_sel(f"""SELECT password FROM public."Users" 
                                     WHERE login = '{login}'""")]
+        print(passwordHash)
         if bool(passwordHash):
-            valid = bcrypt.checkpw(password.encode(), str.encode(passwordHash[0][0]))
+            valid = bcrypt.checkpw(password.encode(), str.encode(passwordHash[0][0]).rstrip())
             if (valid):
                 return self.show_Main()
         return self.ui.error.setText("Логин или пароль не верны")

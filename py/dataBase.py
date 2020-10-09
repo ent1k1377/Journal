@@ -1,14 +1,15 @@
-import sqlite3
+import sqlalchemy as sqla
 
-conn = sqlite3.connect("../db/main.db")  # или :memory: чтобы сохранить в RAM
-cursor = conn.cursor()
+engine = sqla.create_engine('postgresql://postgres:root@localhost/postgres')
+print(engine)
+conn = engine.connect()
 
 
 def execute_into(text):
-    cursor.execute(text)
-    conn.commit()
+    conn.execute(text)
 
 
 def execute_sel(text):
-    return cursor.execute(text).fetchall()
+    sql = conn.execute(text)
+    return sql.fetchall()
 
